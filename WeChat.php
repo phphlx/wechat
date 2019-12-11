@@ -109,6 +109,18 @@ class WeChat
         return $arr['media_id'] ? $arr['media_id'] : '';
     }
 
+    public function keFuMessage($openid, $message)
+    {
+        $url = 'https://api.weixin.qq.com/cgi-bin/message/custom/send?access_token=' . $this->getAccessTokenMemcached();
+        $data = [
+            'touser' => $openid,
+            'msgtype' => 'text',
+            'text' => ['content' => $message]
+        ];
+
+        return $this->httpRequest($url, json_encode($data, JSON_UNESCAPED_UNICODE));
+    }
+
     /**
      * @param string $url url地址
      * @param string | array $postArr 请求体
