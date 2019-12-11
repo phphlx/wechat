@@ -126,10 +126,33 @@ class wechatCallbackapiTest
         return $resultStr;
     }
 
+    //时间处理
+    private function eventFunction($obj)
+    {
+        $eventType = $obj->Event;
+
+        switch ($eventType) {
+            case 'CLICK':
+                return $this->clickFunction($obj);
+                break;
+        }
+    }
+
+    private function clickFunction($obj)
+    {
+        $eventKey = $obj->EventKey;
+        if ($eventKey == 'index001') {
+            return $this->createText($obj, '你点击了首页');
+        } elseif ($eventKey == 'kefu001') {
+            return $this->createText($obj, '你点击找客服小姐姐');
+        }
+        return $this->createText($obj, '我解决不了');
+    }
+
     private function writeLog($log, $flag = 1)
     {
         $flagStr = $flag == 1 ? '接收' : '发送';
-        $prevStr = $flagStr . date('Y-m-d H:i:s') . "--------------------------------------------------\n";
+        $prevStr = $flagStr . date('Y-m-d H:i:s') . "--------------------------------------------\n";
         $log = $prevStr . $log . PHP_EOL;
         file_put_contents('test.log', $log, FILE_APPEND);
         return true;

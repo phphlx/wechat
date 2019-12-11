@@ -1,6 +1,9 @@
 <?php
 
 $wx = new WeChat();
+//删除菜单
+echo $wx->deleteMenu();
+//创建菜单
 $menuList = include 'menu.php';
 echo $wx->createMenu($menuList);
 
@@ -57,11 +60,16 @@ class WeChat
         $json = $this->httpRequest($url);
         $arr = json_decode($json, true);
         $access_token = $arr['access_token'];
-        $memcached->set($cacheKey, $access_token, 0, 7000);
+        $memcached->set($cacheKey, $access_token, 7000);
 //        echo '我是memcached未缓存' . PHP_EOL;
         return $access_token;
     }
 
+    /**
+     * 创建自定义菜单
+     * @param array | string $arr
+     * @return bool|string
+     */
     public function createMenu($arr)
     {
         if (is_array($arr)) {
@@ -73,6 +81,17 @@ class WeChat
         $json = $this->httpRequest($url, $arr);
 
         return $json;
+    }
+
+    /**
+     * 删除菜单
+     * @return bool|string
+     */
+    public function deleteMenu()
+    {
+        $url = 'https://api.weixin.qq.com/cgi-bin/menu/delete?access_token=' . $this->getAccessTokenMemcached();
+        $result = $this->httpRequest($url);
+        return $result;
     }
 
     /**
