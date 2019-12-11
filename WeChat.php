@@ -2,10 +2,10 @@
 
 $wx = new WeChat();
 //删除菜单
-echo $wx->deleteMenu();
+//echo $wx->deleteMenu();
 //创建菜单
-$menuList = include 'menu.php';
-echo $wx->createMenu($menuList);
+//$menuList = include 'menu.php';
+//echo $wx->createMenu($menuList);
 
 class WeChat
 {
@@ -94,6 +94,21 @@ class WeChat
         return $result;
     }
 
+    public function uploadMaterial($path, $type = 'image', $is_forever = 0)
+    {
+        if ($is_forever) {
+            $surl = 'https://api.weixin.qq.com/cgi-bin/material/add_material?access_token=%s&type=%s';
+        } else {
+            $surl = 'https://api.weixin.qq.com/cgi-bin/media/upload?access_token=%s&type=%s';
+        }
+        $url = sprintf($surl, $this->getAccessTokenMemcached(), $type);
+
+        $json = $this->httpRequest($url, [], $path);
+
+        $arr = json_decode($json, true);
+        return $arr['media_id'] ? $arr['media_id'] : '';
+    }
+
     /**
      * @param string $url url地址
      * @param string | array $postArr 请求体
@@ -103,7 +118,7 @@ class WeChat
     private function httpRequest($url, $postArr = '', $file = '')
     {
         if (!empty($file)) {
-            $postArr['pic'] = new CURLFile($file);
+            $postArr['media'] = new CURLFile($file);
         }
 
         $ch = curl_init();
