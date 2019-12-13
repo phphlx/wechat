@@ -1,6 +1,8 @@
 <?php
 
 $wx = new WeChat();
+$img = $wx->createQrcode(0, 10);
+echo "<img src='$img' >";
 //删除菜单
 //echo $wx->deleteMenu();
 //创建菜单
@@ -119,6 +121,42 @@ class WeChat
         ];
 
         return $this->httpRequest($url, json_encode($data, JSON_UNESCAPED_UNICODE));
+    }
+
+    public function createQrcode($temp = 0, $id = 1)
+    {
+        $url = 'https://api.weixin.qq.com/cgi-bin/qrcode/create?access_token=' . $this->getAccessTokenMemcached();
+        if ($temp === 0) {
+            $data = [
+                "expire_seconds" => 2592000,
+                "action_name" => "QR_SCENE",
+                "action_info" => [
+                    "scene" => [
+                        "scene_id" => $id
+                    ]
+                ]
+            ];
+        } else {
+            $data = [
+                "action_name" => "QR_LIMIT_SCENE",
+                "action_info" => [
+                    "scene" => [
+                        "scene_id" => $id
+                    ]
+                ]
+            ];
+        }
+
+        // 得到 ticket
+        $json = $this->httpRequest($url, json_encode($data, JSON_UNESCAPED_UNICODE));
+        $arr = json_decode($json, true);
+        $ticket = $arr['ticket'];
+        // 用 ticket获取二维码资源
+        $url = 'https://mp.weixin.qq.com/cgi-bin/showqrcode?ticket=' . urlencode($ticket);
+        $imgResource = $this->httpRequest($url);
+
+        file_put_contents('qrcode.jpg', $imgResource);
+        return 'qrcode.jpg';
     }
 
     /**

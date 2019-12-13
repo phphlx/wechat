@@ -1,24 +1,31 @@
 <?php
 // 方倍工作室
 header('Content-type:text');
-define('TOKEN', 'weixin');
-$arr = $_GET;
+
 $wechatObj = new wechatCallbackapiTest();
-if (isset($_GET['echostr'])) { // 第一次接入验证
-    $wechatObj->valid();
-} else { // 第二次以后的处理信息
-    $wechatObj->responseMsg();
-}
 
 class wechatCallbackapiTest
 {
+    const TOKEN = 'weixin';
+
+    private $pdo;
+
+    public function __construct()
+    {
+        if (!empty($_GET['echostr'])) {
+            echo $this->valid();
+        } else {
+            $this->pdo = include 'db.php';
+            $this->responseMsg();
+        }
+    }
+
     public function valid()
     {
         $echoStr = $_GET['echostr'];
         if ($this->checkSignature()) {
             header('content-type:text');;
-            echo $echoStr;
-            exit;
+            return $echoStr;
         }
     }
 
@@ -28,7 +35,7 @@ class wechatCallbackapiTest
         $timestamp = $_GET['timestamp'];
         $nonce = $_GET['nonce'];
 
-        $token = TOKEN;
+        $token = self::TOKEN;
         $tmpArr = [$token, $timestamp, $nonce];
         sort($tmpArr, SORT_STRING);
         $tmpStr = implode($tmpArr);
@@ -134,6 +141,25 @@ class wechatCallbackapiTest
         switch ($eventType) {
             case 'CLICK':
                 return $this->clickFunction($obj);
+                break;
+            case 'subscribe':
+                // 如果 eventKey 没有值, 表示顶级
+                $eventKey = (string)$obj->EventKey;
+
+                //顶级添加数据库
+                if (empty($eventKey)) {
+                    $sql = "insert into users(openid) values(?)";
+                    $stmt = $this->pdo->prepare($sql);
+                    $stmt->execute([$obj->FromUserName]);
+                } else {
+                    $id = (int)str_replace('qrscene_', '', $eventKey);
+                    $sql = "select * from users where id=$id";
+                    $row = $this->pdo->query($sql)->fetch();
+                    $sql = "insert into users(openid, f1, f2, f3) values(?, ?, ?, ?)";
+                    $stmt = $this->pdo->prepare($sql);
+                    $stmt->execute([$obj->FromUserName, $row['openid'], $row['f1'], $row['f2']]);
+                }
+                return $this->createText($obj, '欢迎关注 phphlx的公众平台' . "\n" . '这里有惊喜');
                 break;
         }
     }
