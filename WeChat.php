@@ -1,8 +1,5 @@
 <?php
 
-$wx = new WeChat();
-$img = $wx->createQrcode(0, 10);
-echo "<img src='$img' >";
 //删除菜单
 //echo $wx->deleteMenu();
 //创建菜单
