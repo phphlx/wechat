@@ -1,5 +1,6 @@
 <?php
 
+$wx = new WeChat();
 //删除菜单
 //echo $wx->deleteMenu();
 //创建菜单
@@ -154,6 +155,14 @@ class WeChat
 
         file_put_contents('qrcode.jpg', $imgResource);
         return 'qrcode.jpg';
+    }
+
+    public function getTicket()
+    {
+        $url = 'https://api.weixin.qq.com/cgi-bin/ticket/getticket?type=jsapi&access_token=' . $this->getAccessTokenMemcached();
+        $json = $this->httpRequest($url);
+        $arr = json_decode($json, true);
+        return $arr['ticket'];
     }
 
     /**

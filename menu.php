@@ -83,8 +83,8 @@ return [
                 ],
                 [
                     'type' => 'view',
-                    'name' => '知乎',
-                    'url' => 'http://zhihu.com'
+                    'name' => '显示个人信息',
+                    'url' => 'http://'.$_SERVER['HTTP_HOST'] . '/auth/goto.php'
                 ],
                 [
                     'type' => 'click',

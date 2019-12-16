@@ -1,7 +1,7 @@
 <?php
 
 header('Content-type:text');
-
+var_dump($_SERVER);
 $wechatObj = new wechatCallbackapiTest();
 
 class wechatCallbackapiTest
@@ -108,15 +108,13 @@ class wechatCallbackapiTest
         return $resultStr;
     }
 
-    private
-    function imageFunction($obj)
+    private function imageFunction($obj)
     {
         $mediaid = $obj->MediaId;
         return $this->createImage($obj, $mediaid);
     }
 
-    private
-    function createImage($obj, $mediaid)
+    private function createImage($obj, $mediaid)
     {
         $str = "<xml>
             <ToUserName><![CDATA[%s]]></ToUserName>
@@ -131,8 +129,7 @@ class wechatCallbackapiTest
         return $resultStr;
     }
 
-    private
-    function musicFunction($obj)
+    private function musicFunction($obj)
     {
         $title = '好听的music';
         $description = '试试看, 好不好听';
@@ -141,8 +138,7 @@ class wechatCallbackapiTest
         return $this->createMusic($obj, $title, $description, $mediaId, $url);
     }
 
-    private
-    function createMusic($obj, $title, $description, $mediaId, $url)
+    private function createMusic($obj, $title, $description, $mediaId, $url)
     {
         $str = "<xml>
             <ToUserName><![CDATA[%s]]></ToUserName>
@@ -163,8 +159,7 @@ class wechatCallbackapiTest
     }
 
     //时间处理
-    private
-    function eventFunction($obj)
+    private function eventFunction($obj)
     {
         $eventType = $obj->Event;
 
@@ -213,8 +208,7 @@ class wechatCallbackapiTest
         }
     }
 
-    private
-    function clickFunction($obj)
+    private function clickFunction($obj)
     {
         $eventKey = $obj->EventKey;
         if ($eventKey == 'index001') {
@@ -225,15 +219,13 @@ class wechatCallbackapiTest
         return $this->createText($obj, '我解决不了');
     }
 
-    public
-    function voiceFunction($obj)
+    private function voiceFunction($obj)
     {
         $content = (string)$obj->Recognition ? $obj->Recognition : '语音未识别';
         return $this->createText($obj, $content);
     }
 
-    private
-    function writeLog($log, $flag = 1)
+    private function writeLog($log, $flag = 1)
     {
         $flagStr = $flag == 1 ? '接收' : '发送';
         $prevStr = $flagStr . date('Y-m-d H:i:s') . "--------------------------------------------\n";
