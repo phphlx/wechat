@@ -1,6 +1,7 @@
 <?php
 
-$wx = new WeChat();
+//$wx = new WeChat();
+//echo $wx->signature();
 //删除菜单
 //echo $wx->deleteMenu();
 //创建菜单
@@ -157,12 +158,47 @@ class WeChat
         return 'qrcode.jpg';
     }
 
-    public function getTicket()
+    public function signature()
+    {
+        $ticket = $this->getTicket();
+        $noncestr = $this->noncestr();
+        $timestamp = time();
+        $url = $this->getCurrentUrl();
+
+
+        $str = 'jsapi_ticket=%s&noncestr=%s&timestamp=%s&url=%s';
+        $str = sprintf($str, $ticket, $noncestr, $timestamp, $url);
+
+        $signature =  sha1($str);
+        return [
+            'appid' => self::APPID,
+            'noncestr' => $noncestr,
+            'timestamp' => $timestamp,
+            'signature' => $signature
+        ];
+    }
+
+    private function getTicket()
     {
         $url = 'https://api.weixin.qq.com/cgi-bin/ticket/getticket?type=jsapi&access_token=' . $this->getAccessTokenMemcached();
         $json = $this->httpRequest($url);
         $arr = json_decode($json, true);
         return $arr['ticket'];
+    }
+
+    private function noncestr($length = 16)
+    {
+        $str = 'asdfghjklqwertyuiopzxcvbnm';
+        $str = md5($str);
+        $str = str_shuffle($str);
+        return substr($str, 0, $length);
+    }
+
+    private function getCurrentUrl()
+    {
+        $protocol = stripos($_SERVER['SERVER_PROTOCOL'], 'https') === true ? 'https' : 'http';
+        return $protocol . '://' . $_SERVER['HTTP_X_ORIGINAL_HOST'] . $_SERVER['REQUEST_URI'];
+        //TODO HOST需要修改
     }
 
     /**

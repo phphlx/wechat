@@ -65,7 +65,7 @@
 //        "url":"http://baidu.com"
 //    }]
 // }';
-
+$protocol = stripos($_SERVER['SERVER_PROTOCOL'], 'https') === true ? 'https' : 'http';
 return [
     'button' => [
         [
@@ -84,7 +84,7 @@ return [
                 [
                     'type' => 'view',
                     'name' => '显示个人信息',
-                    'url' => 'http://'.$_SERVER['HTTP_HOST'] . '/auth/goto.php'
+                    'url' => $protocol . '://' . $_SERVER['HTTP_HOST'] . '/auth/goto.php'
                 ],
                 [
                     'type' => 'click',
